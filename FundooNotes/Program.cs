@@ -13,7 +13,7 @@ namespace FundooNotes
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to the FundooNotes project.");
+            //Console.WriteLine("Welcome to the FundooNotes project.");
             CreateHostBuilder(args).Build().Run();
         }
 
