@@ -17,14 +17,14 @@ namespace RepositoryLayer.Services
     public class UserRL : IUserRL
     {
         FundooContextDB fundooContext;
-        
+
 
         public IConfiguration Configuration { get; }
 
         public UserRL(FundooContextDB fundooContext, IConfiguration Configuration)
         {
             this.fundooContext = fundooContext;
-            this.Configuration = Configuration;
+           this.Configuration = Configuration;
 
         }
         public void AddUser(UserPostModel user)
@@ -49,63 +49,62 @@ namespace RepositoryLayer.Services
         {
             try
             {
-                if(string.IsNullOrEmpty(password))
+                if (string.IsNullOrEmpty(password))
                 {
                     return null;
                 }
                 else
                 {
                     Byte[] b = Encoding.ASCII.GetBytes(password);
-                    string encrypted=Convert.ToBase64String(b);
+                    string encrypted = Convert.ToBase64String(b);
                     return encrypted;
 
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
         }
-        //public string DecrypString(string password)
-        //{
-        //    Byte[] b;
-        //    string decrypted;
-        //    try
-        //    {
-        //        b = Convert.FromBase64String(password);
-        //        decrypted = System.Text.ASCIIEncoding.ASCII.GetString(b);
-        //    }
-        //    catch (FormatException)
-
-
-        //    {
-        //        decrypted = "";
-        //    }
-        //    return decrypted;
-
-        //}
+        public string DecrypString(string password)
+        {
+            Byte[] b;
+            string decrypted;
+            try
+            {
+                b = Convert.FromBase64String(password);
+                decrypted = System.Text.ASCIIEncoding.ASCII.GetString(b);
+                return decrypted;
+            }
+            catch (FormatException)
+            {
+                throw;
+            }
+          
+        }
 
         public string LoginUser(string Email, string Password)
         {
             try
             {
 
-                var user = fundooContext.User.FirstOrDefault(u => u.Email == Email && u.Password == Password);
-
+                //var user = fundooContext.User.FirstOrDefault(u => u.Email == Email && u.Password == Password);
+                var user = fundooContext.User.Where(u => u.Email == Email).FirstOrDefault();
+                string pass = DecrypString(user.Password);
                 if (user == null)
                 {
                     return null;
                 }
-                //string decryptedPass =DecrypString(user.Password);
+                //string decryptedPass = DecrypString(user.Password);
                 //if (decryptedPass == Password)
-                return GenerateJWTToken(Email, user.UserID);
+                    return GenerateJWTToken(Email, user.UserID);
                 //throw new Exception("Incorrect Password");
             }
             catch (Exception ex)
             {
                 throw ex;
             }
-            
+
         }
 
         private string GenerateJWTToken(string email, int userId)
@@ -155,7 +154,7 @@ namespace RepositoryLayer.Services
                 Message Mymessage = new Message();
                 Mymessage.Formatter = new BinaryMessageFormatter();
                 Mymessage.Body = GenerateJWTToken(Email, userdata.UserID);
-                Mymessage.Label = "Forgot Password email";               
+                Mymessage.Label = "Forgot Password email";
                 queue.Send(Mymessage);
 
                 Message msg = queue.Receive();
@@ -166,7 +165,7 @@ namespace RepositoryLayer.Services
 
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -174,7 +173,7 @@ namespace RepositoryLayer.Services
 
         private void msmqQueue_ReceiveCompleted(object sender, ReceiveCompletedEventArgs e)
         {
-            try 
+            try
             {
                 MessageQueue queue = (MessageQueue)sender;
                 Message msg = queue.EndReceive(e.AsyncResult);
@@ -219,7 +218,7 @@ namespace RepositoryLayer.Services
                 var user = fundooContext.User.FirstOrDefault(u => u.Email == Email);
                 if (changePassword.Password.Equals(changePassword.ConfirmPassword))
                 {
-                    
+
                     user.Password = EncryptPassword(changePassword.Password);
                     fundooContext.SaveChanges();
                     return true;

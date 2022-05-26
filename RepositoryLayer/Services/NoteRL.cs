@@ -41,7 +41,7 @@ namespace RepositoryLayer.Services
                 note.RegisterDate = DateTime.Now;
                 note.ModifyDate = DateTime.Now;               
                 
-                fundooContext.Add(note);
+                fundooContext.Notes.Add(note);
                 await fundooContext.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -211,9 +211,9 @@ namespace RepositoryLayer.Services
         {
             try
             {
-                List<Note> list = new List<Note>();
-                list = await fundooContext.Notes.Include(u => u.User).ToListAsync();
-                return list;
+                //List<Note> list = new List<Note>();
+               return await fundooContext.Notes.Where(u => u.UserID == userID).Include(u => u.User).ToListAsync();
+               // return list;
             }
             catch (Exception)
             {

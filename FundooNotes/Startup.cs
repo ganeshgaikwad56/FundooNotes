@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RepositoryLayer.Entities;
 using RepositoryLayer.FundooContext;
 using RepositoryLayer.Interfaces;
 using RepositoryLayer.Services;
@@ -36,15 +37,14 @@ namespace FundooNotes
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddMemoryCache();
+            services.AddControllers().AddNewtonsoftJson(options =>
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            //services.AddDbContext<FundooContextDB>(opts => opts.UseSqlServer(Configuration["ConnectionStrings:FundooNotes"]));
             services.AddDbContext<FundooContextDB>(opts => opts.UseSqlServer(Configuration["ConnectionStrings:FundooNotes"]));
-            services.AddTransient<IUserRL, UserRL>();
-            services.AddTransient<IUserBL, UserBL>();
 
-            services.AddTransient<INoteRL, NoteRL>();
-            services.AddTransient<INoteBL, NoteBL>();
+            //Instance for injected object
 
-            services.AddTransient<ILableBL, LableBL>();
-            services.AddTransient<ILableRL, LableRL>();
             services.AddSwaggerGen(setup =>
             {
                 // Include 'SecurityScheme' to use JWT Authentication
@@ -72,6 +72,12 @@ namespace FundooNotes
                 });
 
             });
+            services.AddDistributedRedisCache(
+                options =>
+                {
+                    options.Configuration = "Localhost:6379";
+                }
+                );
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -89,6 +95,15 @@ namespace FundooNotes
 
                 };
             });
+
+            services.AddTransient<IUserRL, UserRL>();
+            services.AddTransient<IUserBL, UserBL>();
+
+            services.AddTransient<INoteRL, NoteRL>();
+            services.AddTransient<INoteBL, NoteBL>();
+
+            services.AddTransient<ILabelBL, LabelBL>();
+            services.AddTransient<ILabelRL, LabelRL>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

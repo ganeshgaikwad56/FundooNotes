@@ -2,11 +2,15 @@
 using CommanLayer.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 using RepositoryLayer.Entities;
 using RepositoryLayer.FundooContext;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace FundooNotes.Controllers
@@ -15,10 +19,14 @@ namespace FundooNotes.Controllers
     {
         FundooContextDB fundooContext;
         INoteBL NoteBL;
-        public NoteController(INoteBL NoteBL, FundooContextDB fundoos)
+        private readonly IMemoryCache memoryCache;
+        private readonly IDistributedCache distributedCache;
+        public NoteController(INoteBL NoteBL, FundooContextDB fundoos, IMemoryCache memoryCache, IDistributedCache distributedCache)
         {
-            this.NoteBL = NoteBL; 
+            this.NoteBL = NoteBL;
             this.fundooContext = fundoos;
+            this.memoryCache = memoryCache;
+            this.distributedCache = distributedCache;
         }
         [Authorize]
         [HttpPost("AddNote")]
@@ -33,7 +41,7 @@ namespace FundooNotes.Controllers
                 await this.NoteBL.AddNote(UserId, notePostModel);
                 return this.Ok(new { success = true, message = "Note Added Successfully " });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -49,9 +57,9 @@ namespace FundooNotes.Controllers
                 var note = fundooContext.Notes.FirstOrDefault(x => x.UserID == UserId && x.NoteId == noteID);
                 if (note == null)
                 {
-                    return this.BadRequest(new { success = false, message = "Sorry! This noteID is doesn't exist"});
+                    return this.BadRequest(new { success = false, message = "Sorry! This noteID is doesn't exist" });
                 }
-                await this.NoteBL.ChangeColour(UserId,noteID, colour);
+                await this.NoteBL.ChangeColour(UserId, noteID, colour);
                 return this.Ok(new { success = true, message = "Colour change successfully" });
             }
             catch (Exception ex)
@@ -97,7 +105,7 @@ namespace FundooNotes.Controllers
                 await this.NoteBL.ArchieveNote(UserId, noteID);
                 return this.Ok(new { success = true, message = "Archieve Note Success" });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -202,6 +210,37 @@ namespace FundooNotes.Controllers
                 throw ex;
             }
         }
-
+        [HttpGet("GetAllNotesRedis")]
+        public async Task<ActionResult> GetAllNote()
+        {
+            try
+            {
+                string serializeNoteList;
+                string key = "Ganesh";
+                var noteList = new List<Note>();
+                var redisNoteList = await distributedCache.GetAsync(key);
+                if (redisNoteList != null)
+                {
+                    serializeNoteList = Encoding.UTF8.GetString(redisNoteList);
+                    noteList = JsonConvert.DeserializeObject<List<Note>>(serializeNoteList);
+                }
+                else
+                {
+                    var userid = User.Claims.FirstOrDefault(x => x.Type.ToString().Equals("UserID", StringComparison.InvariantCultureIgnoreCase));
+                    int userID = Int32.Parse(userid.Value);
+                    noteList = await this.NoteBL.GetAllNotes(userID);
+                    serializeNoteList = JsonConvert.SerializeObject(noteList);
+                    redisNoteList = Encoding.UTF8.GetBytes(serializeNoteList);
+                    var option = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(20)).SetAbsoluteExpiration(TimeSpan.FromHours(6));
+                    await distributedCache.SetAsync(key, redisNoteList, option);
+                }
+                return this.Ok(new { success = true, message = "Get note successful!!!", data = noteList });
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
+
 }

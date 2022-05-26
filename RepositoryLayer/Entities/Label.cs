@@ -7,7 +7,7 @@ using System.Text;
 
 namespace RepositoryLayer.Entities
 {
-    public class Lable
+    public class Label
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

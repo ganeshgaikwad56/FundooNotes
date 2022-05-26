@@ -2,7 +2,7 @@
 
 namespace RepositoryLayer.Migrations
 {
-    public partial class NoteTable1 : Migration
+    public partial class LabelTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

@@ -10,8 +10,8 @@ using RepositoryLayer.FundooContext;
 namespace RepositoryLayer.Migrations
 {
     [DbContext(typeof(FundooContextDB))]
-    [Migration("20220513121530_UserTable1")]
-    partial class UserTable1
+    [Migration("20220514152553_UserTable")]
+    partial class UserTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,7 +21,7 @@ namespace RepositoryLayer.Migrations
                 .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("RepositoryLayer.Entities.Lable", b =>
+            modelBuilder.Entity("RepositoryLayer.Entities.Label", b =>
                 {
                     b.Property<int>("LableId")
                         .ValueGeneratedOnAdd()
@@ -43,7 +43,7 @@ namespace RepositoryLayer.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Lables");
+                    b.ToTable("Labels");
                 });
 
             modelBuilder.Entity("RepositoryLayer.Entities.Note", b =>
@@ -121,7 +121,7 @@ namespace RepositoryLayer.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("RepositoryLayer.Entities.Lable", b =>
+            modelBuilder.Entity("RepositoryLayer.Entities.Label", b =>
                 {
                     b.HasOne("RepositoryLayer.Entities.Note", "Note")
                         .WithMany("Lables")

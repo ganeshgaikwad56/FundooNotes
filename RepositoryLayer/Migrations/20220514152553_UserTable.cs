@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace RepositoryLayer.Migrations
 {
-    public partial class UserTable1 : Migration
+    public partial class UserTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -53,7 +53,7 @@ namespace RepositoryLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Lables",
+                name: "Labels",
                 columns: table => new
                 {
                     LableId = table.Column<int>(type: "int", nullable: false)
@@ -64,15 +64,15 @@ namespace RepositoryLayer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Lables", x => x.LableId);
+                    table.PrimaryKey("PK_Labels", x => x.LableId);
                     table.ForeignKey(
-                        name: "FK_Lables_Notes_NoteId",
+                        name: "FK_Labels_Notes_NoteId",
                         column: x => x.NoteId,
                         principalTable: "Notes",
                         principalColumn: "NoteId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Lables_User_UserID",
+                        name: "FK_Labels_User_UserID",
                         column: x => x.UserID,
                         principalTable: "User",
                         principalColumn: "UserID",
@@ -80,13 +80,13 @@ namespace RepositoryLayer.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Lables_NoteId",
-                table: "Lables",
+                name: "IX_Labels_NoteId",
+                table: "Labels",
                 column: "NoteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Lables_UserID",
-                table: "Lables",
+                name: "IX_Labels_UserID",
+                table: "Labels",
                 column: "UserID");
 
             migrationBuilder.CreateIndex(
@@ -105,7 +105,7 @@ namespace RepositoryLayer.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Lables");
+                name: "Labels");
 
             migrationBuilder.DropTable(
                 name: "Notes");

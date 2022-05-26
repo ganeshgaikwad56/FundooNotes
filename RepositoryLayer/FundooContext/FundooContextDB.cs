@@ -16,13 +16,13 @@ namespace RepositoryLayer.FundooContext
 
         public DbSet<User> User { get; set; }
         public DbSet<Note> Notes { get; set; }
-        public DbSet<Lable> Lables { get; set; }
+        public DbSet<Label> Labels { get; set; }
 
-
+        //region Required
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
         }
-
+        //region Ending
     }
 }
