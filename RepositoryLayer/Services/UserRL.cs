@@ -29,13 +29,16 @@ namespace RepositoryLayer.Services
         }
         public void AddUser(UserPostModel user)
         {
+            string passwordToEncript = string.Empty;
             try
             {
                 User userdata = new User();
                 userdata.Firstname = user.Firstname;
                 userdata.Lastname = user.Lastname;
                 userdata.Email = user.Email;
-                userdata.Password = EncryptPassword(user.Password);
+                //userdata.Password = EncryptPassword(user.Password);
+                passwordToEncript = EncodePasswordToBase64(user.Password);
+                userdata.Password = passwordToEncript;
                 fundooContext.Add(userdata);
                 fundooContext.SaveChanges();
             }
@@ -45,60 +48,69 @@ namespace RepositoryLayer.Services
             }
         }
 
-        private string EncryptPassword(string password)
+        public string EncodePasswordToBase64(string Password)
         {
             try
             {
-                if (string.IsNullOrEmpty(password))
-                {
-                    return null;
-                }
-                else
-                {
-                    Byte[] b = Encoding.ASCII.GetBytes(password);
-                    string encrypted = Convert.ToBase64String(b);
-                    return encrypted;
-
-                }
+                byte[] encData_byte = new byte[Password.Length];
+                encData_byte = System.Text.Encoding.UTF8.GetBytes(Password);
+                string encodedData = Convert.ToBase64String(encData_byte);
+                return encodedData;
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw new Exception("Error in base64Encode" + ex.Message);
             }
         }
-        public string DecrypString(string password)
+        public string DecodeFrom64(string encodedData)
         {
-            Byte[] b;
-            string decrypted;
-            try
-            {
-                b = Convert.FromBase64String(password);
-                decrypted = System.Text.ASCIIEncoding.ASCII.GetString(b);
-                return decrypted;
-            }
-            catch (FormatException)
-            {
-                throw;
-            }
-          
+            System.Text.UTF8Encoding encoder = new System.Text.UTF8Encoding();
+            System.Text.Decoder utf8Decode = encoder.GetDecoder();
+            byte[] todecode_byte = Convert.FromBase64String(encodedData);
+            int charCount = utf8Decode.GetCharCount(todecode_byte, 0, todecode_byte.Length);
+            char[] decoded_char = new char[charCount];
+            utf8Decode.GetChars(todecode_byte, 0, todecode_byte.Length, decoded_char, 0);
+            string result = new String(decoded_char);
+            return result;
         }
 
         public string LoginUser(string Email, string Password)
         {
             try
             {
+                var AllRecords = fundooContext.User.ToList();
+                var existingRecord = AllRecords.Where(x => x.Email == Email).FirstOrDefault();
 
-                //var user = fundooContext.User.FirstOrDefault(u => u.Email == Email && u.Password == Password);
-                var user = fundooContext.User.Where(u => u.Email == Email).FirstOrDefault();
-                string pass = DecrypString(user.Password);
-                if (user == null)
+                if (existingRecord != null)
+                {
+                    var decriptedPassword = DecodeFrom64(existingRecord.Password);
+                    bool conditionCheck = decriptedPassword == Password ? true : false;
+                    if (conditionCheck == false)
+                    {
+                        return "Invalid credentials";
+                    }
+                    else
+                    {
+                        return GenerateJWTToken(existingRecord.Email, existingRecord.UserID);
+                    }
+                }
+                else
                 {
                     return null;
                 }
-                //string decryptedPass = DecrypString(user.Password);
-                //if (decryptedPass == Password)
-                    return GenerateJWTToken(Email, user.UserID);
-                //throw new Exception("Incorrect Password");
+
+                ////var user = fundooContext.User.FirstOrDefault(u => u.Email == Email && u.Password == Password);
+                //var user = fundooContext.User.Where(u => u.Email == Email).FirstOrDefault();
+                //string pass = (user.Password);
+                //if (user == null)
+                //{
+                //    return null;
+                //}
+                ////string decryptedPass = DecrypString(user.Password);
+                ////if (decryptedPass == Password)
+                //    return GenerateJWTToken(Email, user.UserID);
+                ////throw new Exception("Incorrect Password");
+
             }
             catch (Exception ex)
             {
@@ -219,7 +231,7 @@ namespace RepositoryLayer.Services
                 if (changePassword.Password.Equals(changePassword.ConfirmPassword))
                 {
 
-                    user.Password = EncryptPassword(changePassword.Password);
+                    user.Password = EncodePasswordToBase64(changePassword.Password);
                     fundooContext.SaveChanges();
                     return true;
                 }

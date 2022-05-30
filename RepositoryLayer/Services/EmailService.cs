@@ -27,7 +27,7 @@ namespace RepositoryLayer.Services
                                    "<body style=\"background -color:#ff7f26;text-align:center;\"> " +
                                    "<h1 style=\"color:#051a80;\">Hello Ganesh</h1>" +
                                    "<h2 style=\"color:#800000;\">Please tab on the below link to change yourn password.</h2>" +
-                                   "</body>" + $"www.fundooNotes.com/reset-password/{token}" +
+                                   "</body>" + $"http://localhost:4200/reset-password/{token}" +
                                    
                                     "<html>";
                 client.Send(messageObj);

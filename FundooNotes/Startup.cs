@@ -42,7 +42,15 @@ namespace FundooNotes
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             //services.AddDbContext<FundooContextDB>(opts => opts.UseSqlServer(Configuration["ConnectionStrings:FundooNotes"]));
             services.AddDbContext<FundooContextDB>(opts => opts.UseSqlServer(Configuration["ConnectionStrings:FundooNotes"]));
-
+            //Configur CORS
+            services.AddCors(options =>
+            {
+                options.AddPolicy(
+                name: "AllowOrigin",
+              builder => {
+                  builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+              });
+            });
             //Instance for injected object
 
             services.AddSwaggerGen(setup =>
@@ -121,7 +129,8 @@ namespace FundooNotes
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+            app.UseCors("AllowOrigin");
+
             app.UseHttpsRedirection();
 
             app.UseRouting();

@@ -36,18 +36,24 @@ namespace FundooNotes.Controllers
                 throw ex;
             }
         }
-        [HttpPost("login")]
+        [HttpPost("login/{Email}/{Password}")]
         public ActionResult LoginUser(string Email, string Password)
         {
             try
             {
-                var userdata = fundooContext.User.FirstOrDefault(u => u.Email == Email && u.Password == Password);//linq
-                if (userdata == null)
+                //var userdata = fundooContext.User.FirstOrDefault(u => u.Email == Email && u.Password == Password);//linq
+                //if (userdata == null)
+                //{
+                //    return this.BadRequest(new { Success = false, message = "Email and Password Invalid." });
+                //}
+                //var check = this.userBL.LoginUser(Email, Password);
+                //return this.Ok(new { Success = true, message = $"User Login Successfully {check} " });
+                string token = this.userBL.LoginUser(Email, Password);
+                if (token == null)
                 {
-                    return this.BadRequest(new { Success = false, message = "Email and Password Invalid." });
+                    return this.BadRequest(new { success = false, message = $"Email or Password is invalid" });
                 }
-                var check = this.userBL.LoginUser(Email, Password);
-                return this.Ok(new { Success = true, message = $"User Login Successfully {check} " });
+                return this.Ok(new { success = true, message = $"Token Generated is", data=token });
             }
             catch (Exception ex)
             {
