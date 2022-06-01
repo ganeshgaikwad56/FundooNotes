@@ -11,7 +11,7 @@ namespace CommanLayer.Users
         public string Title { get; set; }
         [Required]
         public string Description { get; set; }
-        [Required]
+        
         public string Colour { get; set; }
     }
 }
