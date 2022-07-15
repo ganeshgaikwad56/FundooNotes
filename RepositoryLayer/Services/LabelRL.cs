@@ -23,7 +23,7 @@ namespace RepositoryLayer.Services
             this.Configuration = Configuration;
 
         }
-        public async Task AddLabel(int userId, int noteId, string lableName)
+        public async Task AddLabel(int userId, int noteId, string labelName)
         {
             try
             {
@@ -34,7 +34,28 @@ namespace RepositoryLayer.Services
                     User = user,
                     Note = note
                 };
-                label.LableName = lableName;
+                label.LableName = labelName;
+                fundooContext.Labels.Add(label);
+                await fundooContext.SaveChangesAsync();
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public async Task CreatLabel(int userId, string labelName)
+        {
+            try
+            {
+                var user = fundooContext.User.FirstOrDefault(u => u.UserID == userId);
+               
+                Label label = new Label
+                {
+                    User = user,
+                  
+                };
+                label.LableName = labelName;
                 fundooContext.Labels.Add(label);
                 await fundooContext.SaveChangesAsync();
             }

@@ -79,7 +79,7 @@ namespace RepositoryLayer.Services
                     {
                         note.IsArchieve = false;
                     }
-                    if(note.IsArchieve == false)
+                    else
                     {
                         note.IsArchieve = true;
                     }
@@ -132,7 +132,7 @@ namespace RepositoryLayer.Services
                     {
                         note.IsPin = false;
                     }
-                    if (note.IsPin == false)
+                    else
                     {
                         note.IsPin = true;
                     }
@@ -156,7 +156,7 @@ namespace RepositoryLayer.Services
                     {
                         note.IsTrash = false;
                     }
-                    if (note.IsTrash == false)
+                    else
                     {
                         note.IsTrash = true;
                     }

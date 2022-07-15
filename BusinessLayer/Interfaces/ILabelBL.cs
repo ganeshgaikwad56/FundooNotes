@@ -7,7 +7,8 @@ namespace BusinessLayer.Interfaces
 {
     public interface ILabelBL
     {
-        Task AddLabel(int userID, int noteID, string LabelName);
+        Task AddLabel(int userId, int noteId, string labelName);
+        Task CreatLabel(int userId, string labelName);
         Task<RepositoryLayer.Entities.Label> UpdateLabel(int userId, int LabelId, string LabelName);
         Task DeleteLabel(int LabelId, int userId);
 

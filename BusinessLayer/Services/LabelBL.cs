@@ -16,11 +16,23 @@ namespace BusinessLayer.Services
             this.labelRL = labelRL;
         }
 
-        public async Task AddLabel(int userID, int noteID, string LableName)
+        public async Task AddLabel(int userId, int noteId, string labelName)
         {
             try
             {
-                await labelRL.AddLabel(userID, noteID, LableName);
+                await labelRL.AddLabel(userId, noteId, labelName);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task CreatLabel(int userId, string labelName)
+        {
+            try
+            {
+                await labelRL.CreatLabel(userId, labelName);
             }
             catch (Exception ex)
             {

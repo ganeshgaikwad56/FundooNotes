@@ -10,8 +10,7 @@ namespace CommanLayer.Users
         [Required]
         public string Title { get; set; }
         [Required]
-        public string Description { get; set; }
-        [Required]
+        public string Description { get; set; }        
         public string Colour { get; set; }
         public bool IsPin { get; set; }
         public bool IsTrash { get; set; }

@@ -7,7 +7,8 @@ namespace RepositoryLayer.Interfaces
 {
     public interface ILabelRL
     {
-        Task AddLabel(int userID, int noteID,string lableName);
+        Task AddLabel(int userId, int noteId,string labelName);
+        Task CreatLabel(int userId,string labelName);
         Task<Entities.Label> UpdateLabel(int userId, int LabelId, string LabelName);
         Task DeleteLabel(int LabelId, int userId);
 

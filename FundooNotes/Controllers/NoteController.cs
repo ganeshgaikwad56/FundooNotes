@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 
 namespace FundooNotes.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     public class NoteController : ControllerBase
     {
         FundooContextDB fundooContext;

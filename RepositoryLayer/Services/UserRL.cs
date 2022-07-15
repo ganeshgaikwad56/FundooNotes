@@ -132,7 +132,7 @@ namespace RepositoryLayer.Services
                     new Claim("email", email),
                     new Claim("userId",userId.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddHours(24),
 
                 SigningCredentials =
                 new SigningCredentials(
@@ -212,7 +212,7 @@ namespace RepositoryLayer.Services
                 {
                     new Claim("email", email)
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddHours(5),
 
                 SigningCredentials =
                 new SigningCredentials(

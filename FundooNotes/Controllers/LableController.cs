@@ -37,6 +37,25 @@ namespace FundooNotes.Controllers
                 throw ex;
             }
         }
+
+        [Authorize]
+        [HttpPost("CreatLabel/{labelName}")]
+        public async Task<ActionResult> CreatLabel(string labelName)
+        {
+            try
+            {
+                var userid = User.Claims.FirstOrDefault(x => x.Type.ToString().Equals("UserID", StringComparison.InvariantCultureIgnoreCase));
+                int userId = Int32.Parse(userid.Value);
+                //int noteId = Int32.Parse(userid.Value);
+
+                await this.labelBL.CreatLabel(userId, labelName);
+                return this.Ok(new { success = true, message = "Labele created Successfully " });
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         [Authorize]
         [HttpDelete("DeleteLable/{LabelId}")]
         public async Task<ActionResult> DeleteLable(int LabelId)
@@ -81,15 +100,15 @@ namespace FundooNotes.Controllers
         }
 
         [Authorize]
-        [HttpGet("GetLabelByuserId/{userId}")]
-        public async Task<ActionResult> GetLabelByuserId(int userId)
+        [HttpGet("GetLabelByuserId/{userID}")]
+        public async Task<ActionResult> GetLabelByuserId()
         {
             try
             {
                 List<RepositoryLayer.Entities.Label> list = new List<RepositoryLayer.Entities.Label>();
                 var userid = User.Claims.FirstOrDefault(x => x.Type.ToString().Equals("UserID", StringComparison.InvariantCultureIgnoreCase));
                 int userID = Int32.Parse(userid.Value);
-                list = await this.labelBL.GetLabelByuserId(userId);
+                list = await this.labelBL.GetLabelByuserId(userID);
                 if (list == null)
                 {
                     return this.BadRequest(new { success = false, message = "Failed to get label" });
